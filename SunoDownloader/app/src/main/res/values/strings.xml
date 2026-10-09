@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Suno Downloader</string>
+    <string name="share_label">Descargar de Suno</string>
+    <string name="import_label">Etiquetar con Suno Downloader</string>
+</resources>
