@@ -18,4 +18,4 @@ jobs:
       - name: Investigar enlaces públicos de Suno
         env:
           SUNO_TEST_ID: ${{ github.event.inputs.song_id }}
-        run: bash SunoDownloader/tools/probe_suno.sh
+        run: bash SunoDownloader/tools/probe_usesuno.sh
