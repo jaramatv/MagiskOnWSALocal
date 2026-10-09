@@ -52,5 +52,13 @@ for f in "$OUT"/files/*; do
   echo "--- $(basename "$f") ($(stat -c %s "$f") bytes)"
   ffprobe -hide_banner -show_entries format=format_name,duration,bit_rate:stream=codec_name,sample_rate,channels,bit_rate:format_tags=title,artist -of compact "$f" 2>&1 | grep -vE 'lyrics|USLT' | head -6
 done
+echo "== 3) UseSuno integrado en la app con el enlace corto"
+share "$SHORT"; sleep 10
+tap_text "Abrir UseSuno en la app" || { scroll_down; tap_text "Abrir UseSuno en la app"; }
+sleep 25; shot 07-usesuno
+adb shell dumpsys activity activities | grep -E "topResumedActivity|ResumedActivity" | head -2
+sleep 20; shot 08-usesuno-later
+adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1; adb pull /sdcard/ui.xml "$OUT/ui.xml" >/dev/null 2>&1
+echo "Textos visibles en UseSuno:"; grep -oE 'text="[^"]{3,60}"' "$OUT/ui.xml" | grep -v '&#10;' | head -15
 adb logcat -d | grep -iE "sunodl|AndroidRuntime|FATAL" | grep -viE "lyrics" | tail -40 > "$OUT/logcat.txt"
 rm -f "$OUT/ui.xml" "$OUT/tap.txt"; rm -rf "$OUT/files"

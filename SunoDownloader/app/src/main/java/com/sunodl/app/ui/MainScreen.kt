@@ -35,6 +35,8 @@ import com.sunodl.app.UiState
 import com.sunodl.app.storage.MusicSaver
 import com.sunodl.app.suno.SongInfo
 import com.sunodl.app.suno.SourceKind
+import com.sunodl.app.suno.SunoLink
+import com.sunodl.app.web.UseSunoActivity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -87,13 +89,42 @@ fun MainScreen(state: UiState, vm: MainViewModel, onPickFile: () -> Unit, onBefo
             state.error?.let { ErrorCard(it) }
             state.song?.let { song ->
                 SongCard(song, state)
+                UseSunoCard(song.pageUrl, ctx, highlighted = song.bestSource == null)
                 if (song.bestSource != null) DownloadSection(song, state, vm, onBeforeDownload)
                 else UnavailableCard(song, ctx)
                 ImportCard(state, vm, onPickFile)
                 song.lyrics?.let { LyricsCard(it, ctx) }
             }
-            if (state.song == null && !state.loading) HelpCard(state, vm, onPickFile)
+            if (state.song == null && !state.loading) {
+                UseSunoCard(SunoLink.parse(state.input)?.let { linkUrl(it) }, ctx, highlighted = false)
+                HelpCard(state, vm, onPickFile)
+            }
             Spacer(Modifier.height(24.dp))
+        }
+    }
+}
+
+private fun linkUrl(link: SunoLink) = when (link) {
+    is SunoLink.Song -> "https://suno.com/song/${link.id}"
+    is SunoLink.Short -> link.url
+}
+
+/** Abre la herramienta de UseSuno dentro de la app (sin navegador externo) con el enlace ya puesto. */
+@Composable
+private fun UseSunoCard(link: String?, ctx: Context, highlighted: Boolean) {
+    val colors = if (highlighted) CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
+        else CardDefaults.cardColors()
+    Card(colors = colors) {
+        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text("Descargar con UseSuno", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+            Text("Usa la herramienta de UseSuno dentro de la app, igual que en su web: eliges MP3, WAV u original, " +
+                "completas su verificación y el archivo se guarda en Música/Suno.",
+                style = MaterialTheme.typography.bodySmall)
+            Button(onClick = { ctx.startActivity(UseSunoActivity.intent(ctx, link)) }, modifier = Modifier.fillMaxWidth()) {
+                Text("Abrir UseSuno en la app")
+            }
+            Text("Servicio de terceros (usesuno.com): puede mostrar anuncios y pedir verificación.",
+                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
@@ -180,8 +211,8 @@ private fun UnavailableCard(song: SongInfo, ctx: Context) {
                 style = MaterialTheme.typography.bodySmall,
             )
             Text(
-                "Esta app no descifra el flujo protegido ni usa servidores de terceros. Si es tu canción, descárgala desde " +
-                    "la app de Suno con tu cuenta (o genera su vídeo para compartir) y usa «Importar archivo» para etiquetarla y convertirla.",
+                "Usa «Abrir UseSuno en la app» (arriba) para descargarla con UseSuno, o descárgala desde Suno con tu cuenta " +
+                    "y usa «Importar archivo» para etiquetarla y convertirla.",
                 style = MaterialTheme.typography.bodySmall,
             )
             OutlinedButton(onClick = {

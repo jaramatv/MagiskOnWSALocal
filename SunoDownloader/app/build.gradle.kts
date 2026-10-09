@@ -64,6 +64,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.6")
     implementation("androidx.work:work-runtime-ktx:2.9.1")
     implementation("androidx.media3:media3-exoplayer:1.4.1")
+    implementation("androidx.webkit:webkit:1.11.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     // Codificador MP3 en Java puro (LAME). Usa javax.sound.sampled.AudioFormat, que se aporta como sustituto mínimo en src/main/java/javax.
     implementation("de.sciss:jump3r:1.0.5")

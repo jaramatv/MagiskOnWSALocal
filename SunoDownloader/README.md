@@ -59,9 +59,18 @@ El código público de `usesuno.com/es/tools/downloader/` muestra que:
 3. **Descifra el audio con AES‑CTR/GCM** en el navegador y lo convierte con lamejs/WASM.
 4. Si falla, usa el vídeo público `cdn1.suno.ai/{id}.mp4` y extrae su pista de audio.
 
-**Esta app no implementa los pasos 1–3**: obtener claves para descifrar un flujo que Suno cifra
-deliberadamente es eludir una protección de contenido, y además haría depender la app de los
-servidores de UseSuno. Sí implementa el paso 4 (recurso público sin cifrar) y el uso de `audio_url`
+**La app no reimplementa los pasos 1–3** (no pide claves ni descifra nada por su cuenta). Para que
+funcione igual que la web, incluye **UseSuno integrado**: la pantalla «Abrir UseSuno en la app» carga
+`usesuno.com/es/tools/downloader/` en un WebView interno (sin abrir el navegador), rellena el enlace y
+envía el formulario. La página hace su verificación, su descarga y su conversión como siempre; cuando
+genera el archivo (MP3, WAV u original), la app lo recibe y lo guarda en Música/Suno.
+
+- El puente página → app usa `addWebMessageListener` limitado al origen `https://usesuno.com` y solo
+  permite guardar archivos en las carpetas públicas de medios.
+- La navegación principal se limita a usesuno.com; otros enlaces se abren fuera.
+- Depende del servicio de UseSuno (puede mostrar anuncios, pedir verificación o cambiar sin aviso).
+
+Además, la app implementa por sí sola el paso 4 (vídeo público sin cifrar) y el uso de `audio_url`
 cuando Suno lo ofrezca.
 
 ### Orden de fuentes en la app

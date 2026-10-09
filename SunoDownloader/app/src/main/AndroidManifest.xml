@@ -53,6 +53,13 @@
             </intent-filter>
         </activity>
 
+        <!-- Herramienta de UseSuno integrada (WebView dentro de la app, sin abrir el navegador). -->
+        <activity
+            android:name=".web.UseSunoActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:windowSoftInputMode="adjustResize" />
+
         <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"
             android:foregroundServiceType="dataSync"
