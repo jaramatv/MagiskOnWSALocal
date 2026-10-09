@@ -1,0 +1,19 @@
+Performing Streamed Install
+Success
+== 1) Enlace corto compartido (canción sin audio público)
+screenshot 01-short-link
+screenshot 02-short-link-scrolled
+== 2) Canción con vídeo público: descarga completa (original + MP3 + WAV)
+screenshot 03-video-song
+tap 'MP3 (convertido)' at 134,528
+screenshot 04-before-download
+no encontrado: Descargar
+no encontrado: Descargar
+screenshot 05-progress
+screenshot 06-done
+== Archivos en /sdcard/Music/Suno
+total 0
+/sdcard/Music/Suno/./: 0 files pulled, 0 skipped.
+stat: cannot statx 'release/test-results/files/*': No such file or directory
+--- * ( bytes)
+release/test-results/files/*: No such file or directory
