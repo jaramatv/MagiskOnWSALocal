@@ -1,12 +1,12 @@
 --------- beginning of main
-10-09 07:18:40.582  3297  3734 I SunoLiveTest: short link -> id=9696c2ff-1d22-462c-aead-1ad324b118e8 title='Despierta' artist='JaramgoTV' dur=193.16 cover=https://cdn2.suno.ai/image_large_9696c2ff-1d22-462c-aead-1ad324b118e8.jpeg lyricsChars=1059 sources=[] encryptedOnly=true
-10-09 07:18:40.744  3297  3734 I SunoLiveTest: video song -> title='This Is My World ( V6 Edition )' sources=[VIDEO_AAC]
-10-09 07:20:03.464  3297  3734 I SunoLiveTest: worker result=Success {mOutputData=Data {saved : This Is My World ( V6 Edition ) - Zombie Robby.m4a
-10-09 07:20:03.464  3297  3734 I SunoLiveTest: This Is My World ( V6 Edition ) - Zombie Robby.mp3
-10-09 07:20:03.464  3297  3734 I SunoLiveTest: This Is My World ( V6 Edition ) - Zombie Robby (WAV convertido).wav, }} in 82s
-10-09 07:20:03.467  3297  3734 I SunoLiveTest: MediaStore: Music/Suno/This Is My World ( V6 Edition ) - Zombie Robby.m4a (5533677 bytes)
-10-09 07:20:03.467  3297  3734 I SunoLiveTest: MediaStore: Music/Suno/This Is My World ( V6 Edition ) - Zombie Robby.mp3 (7258511 bytes)
-10-09 07:20:03.467  3297  3734 I SunoLiveTest: MediaStore: Music/Suno/This Is My World ( V6 Edition ) - Zombie Robby (WAV convertido).wav (43226228 bytes)
-10-09 07:20:03.477  3297  3734 I SunoLiveTest: This Is My World ( V6 Edition ) - Zombie Robby.m4a -> audio/mp4a-latm 48000 Hz 2 ch dur=224.832s
-10-09 07:20:03.481  3297  3734 I SunoLiveTest: This Is My World ( V6 Edition ) - Zombie Robby.mp3 -> audio/mpeg 48000 Hz 2 ch dur=224.88s
-10-09 07:20:03.488  3297  3734 I SunoLiveTest: This Is My World ( V6 Edition ) - Zombie Robby (WAV convertido).wav -> audio/raw 48000 Hz 2 ch dur=224.810666s
+10-09 07:29:38.995  3330  3531 I SunoLiveTest: short link -> id=9696c2ff-1d22-462c-aead-1ad324b118e8 title='Despierta' artist='JaramgoTV' dur=193.16 cover=https://cdn2.suno.ai/image_large_9696c2ff-1d22-462c-aead-1ad324b118e8.jpeg lyricsChars=1059 sources=[] encryptedOnly=true
+10-09 07:29:39.455  3330  3531 I SunoLiveTest: video song -> title='This Is My World ( V6 Edition )' sources=[VIDEO_AAC]
+10-09 07:31:08.332  3330  3531 I SunoLiveTest: worker result=Success {mOutputData=Data {saved : This Is My World ( V6 Edition ) - Zombie Robby.m4a
+10-09 07:31:08.332  3330  3531 I SunoLiveTest: This Is My World ( V6 Edition ) - Zombie Robby.mp3
+10-09 07:31:08.332  3330  3531 I SunoLiveTest: This Is My World ( V6 Edition ) - Zombie Robby (WAV convertido).wav, }} in 88s
+10-09 07:31:08.336  3330  3531 I SunoLiveTest: MediaStore: Music/Suno/This Is My World ( V6 Edition ) - Zombie Robby.m4a (5533677 bytes)
+10-09 07:31:08.336  3330  3531 I SunoLiveTest: MediaStore: Music/Suno/This Is My World ( V6 Edition ) - Zombie Robby.mp3 (7258511 bytes)
+10-09 07:31:08.336  3330  3531 I SunoLiveTest: MediaStore: Music/Suno/This Is My World ( V6 Edition ) - Zombie Robby (WAV convertido).wav (43226228 bytes)
+10-09 07:31:08.347  3330  3531 I SunoLiveTest: This Is My World ( V6 Edition ) - Zombie Robby.m4a -> audio/mp4a-latm 48000 Hz 2 ch dur=224.832s
+10-09 07:31:08.350  3330  3531 I SunoLiveTest: This Is My World ( V6 Edition ) - Zombie Robby.mp3 -> audio/mpeg 48000 Hz 2 ch dur=224.88s
+10-09 07:31:08.361  3330  3531 I SunoLiveTest: This Is My World ( V6 Edition ) - Zombie Robby (WAV convertido).wav -> audio/raw 48000 Hz 2 ch dur=224.810666s

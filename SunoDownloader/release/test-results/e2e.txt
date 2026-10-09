@@ -7,15 +7,16 @@ screenshot 02-short-link-scrolled
 screenshot 03-video-song
 no encontrado: MP3 (convertido)
 screenshot 04-before-download
-tap 'Descargar' at 160,395
+no encontrado: Descargar
+tap 'Descargar' at 160,290
 screenshot 05-progress
 terminado tras 10 s
 screenshot 06-done
 == Archivos en /sdcard/Music/Suno
 total 47628
--rwxrwx--- 1 u0_a187 media_rw 43226228 2026-10-09 07:20 This Is My World ( V6 Edition ) - Zombie Robby (WAV convertido).wav
--rwxrwx--- 1 u0_a187 media_rw  5533677 2026-10-09 07:20 This Is My World ( V6 Edition ) - Zombie Robby.m4a
-/sdcard/Music/Suno/./: 2 files pulled, 0 skipped. 126.4 MB/s (48759905 bytes in 0.368s)
+-rwxrwx--- 1 u0_a188 media_rw 43226228 2026-10-09 07:31 This Is My World ( V6 Edition ) - Zombie Robby (WAV convertido).wav
+-rwxrwx--- 1 u0_a188 media_rw  5533677 2026-10-09 07:31 This Is My World ( V6 Edition ) - Zombie Robby.m4a
+/sdcard/Music/Suno/./: 2 files pulled, 0 skipped. 137.5 MB/s (48759905 bytes in 0.338s)
 --- This Is My World ( V6 Edition ) - Zombie Robby (WAV convertido).wav (43226228 bytes)
 Input #0, wav, from 'release/test-results/files/This Is My World ( V6 Edition ) - Zombie Robby (WAV convertido).wav':
   Metadata:
@@ -29,13 +30,14 @@ Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'release/test-results/files/This Is My W
     major_brand     : mp42
     minor_version   : 0
     compatible_brands: isommp42
-    creation_time   : 2026-10-09T07:20:41.000000Z
+    creation_time   : 2026-10-09T07:31:49.000000Z
 == 3) UseSuno integrado en la app con el enlace corto
 tap 'Abrir UseSuno en la app' at 160,498
 screenshot 07-usesuno
-    topResumedActivity=ActivityRecord{fc810e4 u0 com.sunodl.app/.web.UseSunoActivity t8}
-  ResumedActivity: ActivityRecord{fc810e4 u0 com.sunodl.app/.web.UseSunoActivity t8}
+    topResumedActivity=ActivityRecord{4dfec1a u0 com.sunodl.app/.web.UseSunoActivity t8}
+  ResumedActivity: ActivityRecord{4dfec1a u0 com.sunodl.app/.web.UseSunoActivity t8}
 screenshot 08-usesuno-later
+AUTORRELLENO: el enlace no aparece en la página
 Textos visibles en UseSuno:
 text="Cerrar"
 text="UseSuno"

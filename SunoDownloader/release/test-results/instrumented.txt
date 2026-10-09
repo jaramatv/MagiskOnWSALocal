@@ -29,7 +29,7 @@ INSTRUMENTATION_STATUS: test=fullPipelineFromPublicVideo
 INSTRUMENTATION_STATUS_CODE: 0
 INSTRUMENTATION_RESULT: stream=
 
-Time: 84.764
+Time: 91.373
 
 OK (2 tests)
 
