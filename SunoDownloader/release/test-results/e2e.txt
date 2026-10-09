@@ -7,13 +7,34 @@ screenshot 02-short-link-scrolled
 screenshot 03-video-song
 tap 'MP3 (convertido)' at 134,528
 screenshot 04-before-download
-no encontrado: Descargar
-no encontrado: Descargar
+tap 'Descargar' at 160,290
 screenshot 05-progress
+terminado tras 35 s
 screenshot 06-done
 == Archivos en /sdcard/Music/Suno
-total 0
-/sdcard/Music/Suno/./: 0 files pulled, 0 skipped.
-stat: cannot statx 'release/test-results/files/*': No such file or directory
---- * ( bytes)
-release/test-results/files/*: No such file or directory
+total 54724
+-rwxrwx--- 1 u0_a186 media_rw 43226228 2026-10-09 07:08 This Is My World ( V6 Edition ) - Zombie Robby (WAV convertido).wav
+-rwxrwx--- 1 u0_a186 media_rw  5533677 2026-10-09 07:07 This Is My World ( V6 Edition ) - Zombie Robby.m4a
+-rwxrwx--- 1 u0_a186 media_rw  7258511 2026-10-09 07:08 This Is My World ( V6 Edition ) - Zombie Robby.mp3
+/sdcard/Music/Suno/./: 3 files pulled, 0 skipped. 145.1 MB/s (56018416 bytes in 0.368s)
+--- This Is My World ( V6 Edition ) - Zombie Robby (WAV convertido).wav (43226228 bytes)
+Input #0, wav, from 'release/test-results/files/This Is My World ( V6 Edition ) - Zombie Robby (WAV convertido).wav':
+  Metadata:
+    album           : Suno
+    title           : This Is My World ( V6 Edition )
+    artist          : Zombie Robby
+                    : 
+--- This Is My World ( V6 Edition ) - Zombie Robby.m4a (5533677 bytes)
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'release/test-results/files/This Is My World ( V6 Edition ) - Zombie Robby.m4a':
+  Metadata:
+    major_brand     : mp42
+    minor_version   : 0
+    compatible_brands: isommp42
+    creation_time   : 2026-10-09T07:07:31.000000Z
+--- This Is My World ( V6 Edition ) - Zombie Robby.mp3 (7258511 bytes)
+[mp3 @ 0x558bf7f39d00] Estimating duration from bitrate, this may be inaccurate
+Input #0, mp3, from 'release/test-results/files/This Is My World ( V6 Edition ) - Zombie Robby.mp3':
+  Metadata:
+    title           : This Is My World ( V6 Edition )
+    artist          : Zombie Robby
+    album           : Suno
