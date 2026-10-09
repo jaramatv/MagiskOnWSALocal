@@ -45,7 +45,7 @@ fun MainScreen(state: UiState, vm: MainViewModel, onPickFile: () -> Unit, onBefo
             TopAppBar(
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Image(painterResource(R.mipmap.ic_launcher_round), null, Modifier.size(32.dp).clip(RoundedCornerShape(50)))
+                        Image(painterResource(R.drawable.app_logo), null, Modifier.size(32.dp).clip(RoundedCornerShape(50)))
                         Spacer(Modifier.width(10.dp))
                         Text("Suno Downloader", fontWeight = FontWeight.Bold)
                     }

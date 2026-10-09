@@ -13,8 +13,8 @@ class Mp3Encoder(sampleRate: Int, channels: Int, bitrateKbps: Int, private val o
         LameEncoder.QUALITY_HIGH,
         false,
     )
-    private val inSize = encoder.pcmBufferSize
-    private val mp3Buf = ByteArray(encoder.mP3BufferSize)
+    private val inSize = encoder.getPCMBufferSize()
+    private val mp3Buf = ByteArray(encoder.getMP3BufferSize())
     private val pending = ByteArray(inSize)
     private var pendingLen = 0
 

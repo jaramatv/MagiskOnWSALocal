@@ -4,3 +4,6 @@ local.properties
 *.iml
 .idea/
 /release/*.apk.idsig
+
+# El .gitignore raíz (MagiskOnWSALocal) ignora "download"; el paquete de la app sí debe versionarse.
+!app/src/main/java/com/sunodl/app/download/
