@@ -1,0 +1,21 @@
+name: Suno Downloader
+
+on:
+  push:
+    branches: [ "ccr-9f7a9151-nta6xh" ]
+    paths: [ "SunoDownloader/**", ".github/workflows/suno-downloader.yml" ]
+  workflow_dispatch:
+    inputs:
+      song_id:
+        description: "ID público de Suno para la prueba (opcional)"
+        required: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Investigar enlaces públicos de Suno
+        env:
+          SUNO_TEST_ID: ${{ github.event.inputs.song_id }}
+        run: bash SunoDownloader/tools/probe_suno.sh
