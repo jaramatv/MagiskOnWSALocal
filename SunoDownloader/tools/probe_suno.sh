@@ -1,61 +1,47 @@
 #!/usr/bin/env bash
 # Investiga, desde una red sin restricciones, cómo responde Suno a los enlaces públicos.
-# Solo hace peticiones GET/HEAD anónimas a páginas y recursos públicos.
+# Solo hace peticiones GET/HEAD anónimas a páginas y recursos públicos. No imprime letras.
 set -u
 UA="Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0 Mobile Safari/537.36"
 OUT=probe-out; mkdir -p $OUT
 h() { echo; echo "=================== $* ==================="; }
+sudo apt-get install -y -qq ffmpeg jq >/dev/null 2>&1 || true
 
-h "Home / explore pages -> collect song ids"
+h "Collect song ids"
 for p in "https://suno.com/" "https://suno.com/explore" "https://suno.com/trending" "https://suno.com/discover"; do
-  code=$(curl -sL -A "$UA" -o $OUT/page.html -w '%{http_code}' "$p"); echo "$p -> $code ($(wc -c <$OUT/page.html) bytes)"
+  curl -sL -A "$UA" -o $OUT/page.html "$p"
   grep -oE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' $OUT/page.html >> $OUT/ids.txt || true
 done
-ID="${SUNO_TEST_ID:-}"
-if [ -z "$ID" ]; then
-  for c in $(sort $OUT/ids.txt | uniq -c | sort -rn | awk '{print $2}' | head -40); do
-    code=$(curl -sL -A "$UA" -o $OUT/cand.html -w '%{http_code}' "https://suno.com/song/$c")
-    n=$(grep -c 'audio_url' $OUT/cand.html || true)
-    echo "candidate $c song page -> $code audio_url-lines=$n"
-    if [ "$code" = "200" ] && [ "$n" != "0" ]; then ID=$c; break; fi
-  done
-fi
-echo "TEST ID: $ID"
-[ -z "$ID" ] && exit 0
+[ -n "${SUNO_TEST_ID:-}" ] && echo "$SUNO_TEST_ID" > $OUT/ids.txt
+sort -u $OUT/ids.txt > $OUT/uids.txt; echo "unique ids: $(wc -l < $OUT/uids.txt)"
 
-h "Song page"
-curl -sL -A "$UA" -D $OUT/song.hdr -o $OUT/song.html "https://suno.com/song/$ID"; head -20 $OUT/song.hdr
-echo "size: $(wc -c < $OUT/song.html)"
-echo "--- meta tags"; grep -oE '<meta[^>]+>' $OUT/song.html | head -40
-echo "--- title"; grep -oE '<title>[^<]*</title>' $OUT/song.html
-echo "--- interesting keys (context)"
-for k in audio_url image_large_url image_url video_url display_name duration '\\"prompt' '\\"title' handle major_model_version '\\"status' is_public; do
-  echo "## $k"; grep -oE ".{0,120}$k.{0,200}" $OUT/song.html | head -3
+h "Clip API survey (audio_url / media_urls / downloadable-like keys)"
+n=0
+for c in $(cat $OUT/uids.txt); do
+  code=$(curl -s -A "$UA" -o $OUT/clip.json -w '%{http_code}' "https://studio-api.prod.suno.com/api/clip/$c")
+  [ "$code" != "200" ] && continue
+  jq -e '.audio_url' $OUT/clip.json >/dev/null 2>&1 || continue
+  n=$((n+1)); cp $OUT/clip.json $OUT/clip_$n.json
+  jq -r --arg c "$c" '[$c, .status, .is_public, .audio_url, ((.media_urls//[])|map(.content_type+"@"+(.url|split("/")[2]))|join(";")), .video_url, .metadata.duration, .major_model_version] | map(tostring) | join(" | ")' $OUT/clip.json
+  [ $n -ge 25 ] && break
 done
-echo "--- cdn urls"; grep -oE 'https?:\\?/\\?/[a-z0-9.-]*suno[a-z0-9.-]*\\?/[^"\\ ]{0,120}' $OUT/song.html | sort -u | head -30
+echo "--- all top-level keys of a clip:"; jq -r 'keys|join(",")' $OUT/clip_1.json
+echo "--- metadata keys:"; jq -r '.metadata|keys|join(",")' $OUT/clip_1.json
+echo "--- keys mentioning download/allow/share:"; jq -r '[paths(scalars)|map(tostring)|join(".")]|map(select(test("download|allow|share|forbid|wav|license";"i")))|join("\n")' $OUT/clip_1.json
+for i in 1 2 3; do jq -c '{download: (to_entries|map(select(.key|test("download|allow";"i")))|from_entries)}' $OUT/clip_$i.json 2>/dev/null; done
 
-h "Embed page"
-curl -sL -A "$UA" -o $OUT/embed.html -w '%{http_code}\n' "https://suno.com/embed/$ID"; grep -oE 'audio_url.{0,160}' $OUT/embed.html | head -2
+ID=$(jq -r .id $OUT/clip_1.json)
+h "Resources for $ID"
+M=$(jq -r '.media_urls[0].url // empty' $OUT/clip_1.json); V=$(jq -r '.video_url // empty' $OUT/clip_1.json); I=$(jq -r '.image_large_url // empty' $OUT/clip_1.json)
+for u in "$M" "$V" "$I"; do [ -z "$u" ] && continue; echo "--- $u"; curl -s -A "$UA" -r 0-1023 -o /dev/null -D - "$u" | grep -iE '^(HTTP|content-type|content-range|x-cache|cache-control)'; done
+curl -s -A "$UA" -o $OUT/v.mp4 "$V" && ffprobe -hide_banner $OUT/v.mp4 2>&1 | grep -E 'Duration|Stream' 
 
-h "Studio API (anonymous)"
-for u in "https://studio-api.prod.suno.com/api/clip/$ID" "https://studio-api.prod.suno.com/api/gen/$ID/increment_play_count/v2"; do
-  echo "GET $u"; curl -s -A "$UA" -w '\nHTTP %{http_code}\n' "$u" | head -c 3000; echo
-done
+h "oEmbed"
+curl -s -A "$UA" "https://studio-api-prod.suno.com/api/oembed?url=https%3A%2F%2Fsuno.com%2Fsong%2F$ID" | head -c 800; echo
 
-h "CDN resources"
-AU=$(grep -oE 'audio_url[^,]{0,200}' $OUT/song.html | grep -oE 'https:[^"\\]+' | head -1); echo "audio_url from page: $AU"
-for u in "$AU" "https://cdn1.suno.ai/$ID.mp3" "https://cdn1.suno.ai/$ID.m4a" "https://cdn1.suno.ai/$ID.wav" "https://cdn1.suno.ai/$ID.mp4" "https://cdn2.suno.ai/image_$ID.jpeg" "https://cdn2.suno.ai/image_large_$ID.jpeg" "https://audiopipe.suno.ai/?item_id=$ID"; do
-  [ -z "$u" ] && continue
-  echo "--- HEAD $u"; curl -sI -A "$UA" "$u" | grep -iE '^(HTTP|content-type|content-length|location)'
-  echo "--- GET range (no referer)"; curl -s -A "$UA" -r 0-1023 -o /dev/null -D - "$u" | grep -iE '^(HTTP|content-type|content-range|location)'
-  echo "--- GET range (referer suno.com)"; curl -s -A "$UA" -e "https://suno.com/" -r 0-1023 -o /dev/null -D - "$u" | grep -iE '^(HTTP|content-type|content-range)'
-  echo "--- GET plain curl UA"; curl -s -r 0-1023 -o /dev/null -w 'HTTP %{http_code} %{content_type}\n' "$u"
-done
-curl -sL -A "$UA" -o $OUT/full.mp3 "https://cdn1.suno.ai/$ID.mp3"; echo "full mp3 bytes: $(wc -c < $OUT/full.mp3)"; xxd $OUT/full.mp3 | head -3
-(ffprobe -hide_banner $OUT/full.mp3 2>&1 | tail -8) || file $OUT/full.mp3
-
-h "Short share link pattern"
-grep -oE 'suno\.com\\?/s\\?/[A-Za-z0-9]+' $OUT/song.html $OUT/page.html | head -3
-S=$(grep -ohE 'suno\.com/s/[A-Za-z0-9]+' $OUT/*.html | head -1)
-[ -n "$S" ] && curl -sI -A "$UA" "https://$S" | grep -iE '^(HTTP|location)'
+h "Short links"
+grep -ohE 'suno\.com/s/[A-Za-z0-9]+' $OUT/*.html | sort -u | head -3
+for s in $(grep -ohE 'suno\.com/s/[A-Za-z0-9]+' $OUT/*.html | sort -u | head -2); do curl -sI -A "$UA" "https://$s" | grep -iE '^(HTTP|location)'; done
+curl -sI -A "$UA" "https://suno.com/s/abcdefgh" | grep -iE '^(HTTP|location)'
+curl -sI -A "$UA" "https://app.suno.ai/song/$ID" | grep -iE '^(HTTP|location)'
 exit 0
