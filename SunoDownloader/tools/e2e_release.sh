@@ -59,6 +59,7 @@ sleep 25; shot 07-usesuno
 adb shell dumpsys activity activities | grep -E "topResumedActivity|ResumedActivity" | head -2
 sleep 20; shot 08-usesuno-later
 adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1; adb pull /sdcard/ui.xml "$OUT/ui.xml" >/dev/null 2>&1
+if grep -q "suno.com/s/" "$OUT/ui.xml"; then echo "AUTORRELLENO OK: el enlace aparece en la página"; else echo "AUTORRELLENO: el enlace no aparece en la página"; fi
 echo "Textos visibles en UseSuno:"; grep -oE 'text="[^"]{3,60}"' "$OUT/ui.xml" | grep -v '&#10;' | head -15
 adb logcat -d | grep -iE "sunodl|AndroidRuntime|FATAL" | grep -viE "lyrics" | tail -40 > "$OUT/logcat.txt"
 rm -f "$OUT/ui.xml" "$OUT/tap.txt"; rm -rf "$OUT/files"

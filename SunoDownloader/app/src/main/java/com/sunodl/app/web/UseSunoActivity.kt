@@ -60,6 +60,11 @@ class UseSunoActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val link = intent.getStringExtra(EXTRA_LINK)
+        // Por si el autorrelleno fallara: el enlace queda en el portapapeles para pegarlo a mano.
+        link?.let {
+            (getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager)
+                .setPrimaryClip(android.content.ClipData.newPlainText("Enlace de Suno", it))
+        }
         if (!WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
             Toast.makeText(this, "Actualiza «Android System WebView» desde Google Play para usar UseSuno.", Toast.LENGTH_LONG).show()
             finish()
@@ -181,17 +186,32 @@ class UseSunoActivity : ComponentActivity() {
     /** Rellena el campo del enlace de la página y envía el formulario. */
     private fun fillJs(link: String) = """
 (function(){
+  var LINK = ${JSONObject.quote(link)};
   var tries = 0;
+  function visible(el){ var r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== 'hidden'; }
+  function findField(){
+    var all = Array.prototype.slice.call(document.querySelectorAll('input, textarea')).filter(function(el){
+      var t = (el.type || '').toLowerCase();
+      return ['hidden','checkbox','radio','submit','button','file','search'].indexOf(t) === -1 && !el.disabled && !el.readOnly && visible(el);
+    });
+    return all.filter(function(el){ return /suno/i.test(el.placeholder || '') || /url|link|enlace/i.test((el.name || '') + (el.id || '')); })[0]
+      || all.filter(function(el){ return el.closest('#dl-form, form.dl-form'); })[0] || all[0];
+  }
   (function fill(){
-    var f = document.getElementById('dl-form');
-    var i = f && (f.querySelector('input[type=url]') || f.querySelector('input[type=text]') || f.querySelector('input'));
-    if (!i) { if (++tries < 40) setTimeout(fill, 250); return; }
-    if (i.value) return;
-    var setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set;
-    setter.call(i, ${JSONObject.quote(link)});
+    var i = findField();
+    if (!i) { if (++tries < 60) setTimeout(fill, 250); return; }
+    if (i.value && i.value.indexOf('suno') !== -1) return;
+    i.focus();
+    var proto = i.tagName === 'TEXTAREA' ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
+    Object.getOwnPropertyDescriptor(proto, 'value').set.call(i, LINK);
     i.dispatchEvent(new Event('input', {bubbles: true}));
     i.dispatchEvent(new Event('change', {bubbles: true}));
-    setTimeout(function(){ if (f.requestSubmit) f.requestSubmit(); else f.submit(); }, 300);
+    var f = i.form || i.closest('form');
+    setTimeout(function(){
+      if (!f) return;
+      var btn = f.querySelector('button[type=submit], button:not([type])');
+      if (btn) btn.click(); else if (f.requestSubmit) f.requestSubmit(); else f.submit();
+    }, 400);
   })();
 })();
 """
