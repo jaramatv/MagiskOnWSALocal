@@ -21,7 +21,8 @@ PY
   if [ -n "${X:-}" ]; then adb shell input tap $X $Y; echo "tap '$1' at $X,$Y"; return 0; fi
   echo "no encontrado: $1"; return 1
 }
-scroll_down() { adb shell input swipe 540 1700 540 700 300; sleep 1; }
+read W H < <(adb shell wm size | grep -oE '[0-9]+x[0-9]+' | tail -1 | tr 'x' ' ')
+scroll_down() { adb shell input swipe $((W/2)) $((H*8/10)) $((W/2)) $((H*3/10)) 300; sleep 1; }
 
 adb install -r -g "$APK" || exit 1
 adb shell pm grant $PKG android.permission.POST_NOTIFICATIONS 2>/dev/null || true
@@ -35,7 +36,7 @@ echo "== 2) Canción con vídeo público: descarga completa (original + MP3 + WA
 share "$VIDEO_SONG"; sleep 12; shot 03-video-song
 tap_text "MP3 (convertido)" || true  # WAV ya viene marcado por defecto
 sleep 1; scroll_down; shot 04-before-download
-tap_text "Descargar" || { scroll_down; tap_text "Descargar"; }
+for k in 1 2 3 4; do tap_text "Descargar" && break; scroll_down; done
 for i in $(seq 1 60); do
   sleep 5
   if [ $i = 2 ]; then shot 05-progress; fi
