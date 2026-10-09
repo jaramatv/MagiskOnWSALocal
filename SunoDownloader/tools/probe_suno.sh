@@ -14,8 +14,10 @@ done
 ID="${SUNO_TEST_ID:-}"
 if [ -z "$ID" ]; then
   for c in $(sort $OUT/ids.txt | uniq -c | sort -rn | awk '{print $2}' | head -40); do
-    code=$(curl -s -o /dev/null -w '%{http_code}' -I "https://cdn1.suno.ai/$c.mp3"); echo "candidate $c cdn1 mp3 -> $code"
-    if [ "$code" = "200" ]; then ID=$c; break; fi
+    code=$(curl -sL -A "$UA" -o $OUT/cand.html -w '%{http_code}' "https://suno.com/song/$c")
+    n=$(grep -c 'audio_url' $OUT/cand.html || true)
+    echo "candidate $c song page -> $code audio_url-lines=$n"
+    if [ "$code" = "200" ] && [ "$n" != "0" ]; then ID=$c; break; fi
   done
 fi
 echo "TEST ID: $ID"
@@ -41,11 +43,16 @@ for u in "https://studio-api.prod.suno.com/api/clip/$ID" "https://studio-api.pro
 done
 
 h "CDN resources"
-for u in "https://cdn1.suno.ai/$ID.mp3" "https://cdn1.suno.ai/$ID.m4a" "https://cdn1.suno.ai/$ID.wav" "https://cdn1.suno.ai/$ID.mp4" "https://cdn2.suno.ai/image_$ID.jpeg" "https://cdn2.suno.ai/image_large_$ID.jpeg" "https://cdn1.suno.ai/image_$ID.png" "https://audiopipe.suno.ai/?item_id=$ID"; do
-  echo "--- $u"; curl -sI -A "$UA" "$u" | grep -iE '^(HTTP|content-type|content-length|accept-ranges|cache-control|access-control)' 
+AU=$(grep -oE 'audio_url[^,]{0,200}' $OUT/song.html | grep -oE 'https:[^"\\]+' | head -1); echo "audio_url from page: $AU"
+for u in "$AU" "https://cdn1.suno.ai/$ID.mp3" "https://cdn1.suno.ai/$ID.m4a" "https://cdn1.suno.ai/$ID.wav" "https://cdn1.suno.ai/$ID.mp4" "https://cdn2.suno.ai/image_$ID.jpeg" "https://cdn2.suno.ai/image_large_$ID.jpeg" "https://audiopipe.suno.ai/?item_id=$ID"; do
+  [ -z "$u" ] && continue
+  echo "--- HEAD $u"; curl -sI -A "$UA" "$u" | grep -iE '^(HTTP|content-type|content-length|location)'
+  echo "--- GET range (no referer)"; curl -s -A "$UA" -r 0-1023 -o /dev/null -D - "$u" | grep -iE '^(HTTP|content-type|content-range|location)'
+  echo "--- GET range (referer suno.com)"; curl -s -A "$UA" -e "https://suno.com/" -r 0-1023 -o /dev/null -D - "$u" | grep -iE '^(HTTP|content-type|content-range)'
+  echo "--- GET plain curl UA"; curl -s -r 0-1023 -o /dev/null -w 'HTTP %{http_code} %{content_type}\n' "$u"
 done
-curl -s -r 0-4095 -o $OUT/head.mp3 "https://cdn1.suno.ai/$ID.mp3"; echo "mp3 first bytes:"; xxd $OUT/head.mp3 | head -4
-curl -s -o $OUT/full.mp3 "https://cdn1.suno.ai/$ID.mp3" && (ffprobe -hide_banner $OUT/full.mp3 2>&1 | tail -8 || file $OUT/full.mp3)
+curl -sL -A "$UA" -o $OUT/full.mp3 "https://cdn1.suno.ai/$ID.mp3"; echo "full mp3 bytes: $(wc -c < $OUT/full.mp3)"; xxd $OUT/full.mp3 | head -3
+(ffprobe -hide_banner $OUT/full.mp3 2>&1 | tail -8) || file $OUT/full.mp3
 
 h "Short share link pattern"
 grep -oE 'suno\.com\\?/s\\?/[A-Za-z0-9]+' $OUT/song.html $OUT/page.html | head -3
