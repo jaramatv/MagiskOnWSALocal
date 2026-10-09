@@ -12,7 +12,8 @@ class Id3v2Test {
         assertEquals(tag.size, Id3v2.existingTagSize(tag))
         val ascii = String(tag, Charsets.ISO_8859_1)
         listOf("TIT2", "TPE1", "USLT", "APIC", "WOAS", "COMM").forEach { assertTrue(it, ascii.contains(it)) }
-        assertTrue(String(tag, Charsets.UTF_16LE).contains("Título ñ"))
+        val needle = "Título ñ".toByteArray(Charsets.UTF_16LE)
+        assertTrue((0..tag.size - needle.size).any { i -> needle.indices.all { tag[i + it] == needle[it] } })
     }
 
     @Test fun noTag() = assertEquals(0, Id3v2.existingTagSize(byteArrayOf(0xFF.toByte(), 0xFB.toByte(), 0, 0, 0, 0, 0, 0, 0, 0)))
