@@ -33,7 +33,7 @@ scroll_down; shot 02-short-link-scrolled
 
 echo "== 2) Canción con vídeo público: descarga completa (original + MP3 + WAV)"
 share "$VIDEO_SONG"; sleep 12; shot 03-video-song
-tap_text "WAV (convertido)" || true
+tap_text "MP3 (convertido)" || true  # WAV ya viene marcado por defecto
 sleep 1; scroll_down; shot 04-before-download
 tap_text "Descargar" || { scroll_down; tap_text "Descargar"; }
 for i in $(seq 1 60); do

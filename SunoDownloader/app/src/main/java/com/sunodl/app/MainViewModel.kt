@@ -45,7 +45,7 @@ data class UiState(
     val cover: Bitmap? = null,
     val keepOriginal: Boolean = true,
     val toMp3: Boolean = false,
-    val toWav: Boolean = false,
+    val toWav: Boolean = true,
     val download: DownloadState = DownloadState(),
 )
 
@@ -93,8 +93,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 _state.update {
                     it.copy(loading = false, song = song,
                         keepOriginal = true,
-                        toMp3 = src == SourceKind.VIDEO_AAC,
-                        toWav = false)
+                        toMp3 = false,
+                        toWav = true)
                 }
                 song.coverUrl?.let { url -> loadCover(url) }
             } catch (e: SunoException) {
